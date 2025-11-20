@@ -29,7 +29,8 @@ const App = () => (
             <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="/favourites" element={<Favourites />} />
             <Route path="/dashboard" element={<AgentDashboard />} />
-            <Route path="/dashboard/create" element={<CreateProperty />} />
+          <Route path="/dashboard/create" element={<CreateProperty />} />
+          <Route path="/listings/edit/:id" element={<CreateProperty />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
