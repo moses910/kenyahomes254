@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import PropertyDetail from "./pages/PropertyDetail";
 import Favourites from "./pages/Favourites";
 import AgentDashboard from "./pages/AgentDashboard";
+import CreateProperty from "./pages/CreateProperty";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="/favourites" element={<Favourites />} />
             <Route path="/dashboard" element={<AgentDashboard />} />
+            <Route path="/dashboard/create" element={<CreateProperty />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
