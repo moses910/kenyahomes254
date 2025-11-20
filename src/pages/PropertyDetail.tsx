@@ -59,10 +59,10 @@ export default function PropertyDetail() {
     setProperty(propData);
     setPhotos(propData.property_photos || []);
 
-    // Fetch agent details
+    // Fetch agent details - use public view to only get safe, non-sensitive data
     const { data: agentData } = await supabase
-      .from('profiles')
-      .select('*')
+      .from('public_agent_profiles')
+      .select('id, name, role, verified, created_at')
       .eq('id', propData.agent_id)
       .single();
 
