@@ -11,6 +11,13 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Bed, Bath, Maximize, MapPin, Heart, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+
+const messageSchema = z.object({
+  body: z.string().trim().min(1, 'Message cannot be empty').max(5000, 'Message must be less than 5000 characters'),
+  email: z.string().trim().email('Invalid email format').max(255, 'Email must be less than 255 characters').optional().or(z.literal('')),
+  phone: z.string().trim().regex(/^\+?[0-9\s\-\(\)]{6,20}$/, 'Invalid phone format').max(20, 'Phone must be less than 20 characters').optional().or(z.literal('')),
+});
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -128,8 +135,16 @@ export default function PropertyDetail() {
       return;
     }
 
-    if (!message.trim()) {
-      toast.error('Please enter a message');
+    // Validate input
+    const validation = messageSchema.safeParse({
+      body: message,
+      email: contactEmail || user.email,
+      phone: contactPhone,
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
       return;
     }
 
@@ -141,15 +156,16 @@ export default function PropertyDetail() {
         property_id: property.id,
         seeker_id: user.id,
         agent_id: property.agent_id,
-        body: message,
-        email: contactEmail || user.email,
-        phone: contactPhone,
+        body: message.trim(),
+        email: contactEmail.trim() || user.email,
+        phone: contactPhone.trim() || null,
       });
 
     setSending(false);
 
     if (error) {
-      toast.error('Failed to send message');
+      console.error('Message send error:', error);
+      toast.error(error.message || 'Failed to send message');
     } else {
       toast.success('Message sent successfully!');
       setMessage('');
