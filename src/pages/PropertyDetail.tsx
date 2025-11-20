@@ -274,13 +274,12 @@ export default function PropertyDetail() {
                 <CardContent className="space-y-4">
                   <div>
                     <p className="font-semibold text-lg">{agent.name || 'Agent'}</p>
-                    <p className="text-sm text-muted-foreground">{agent.email}</p>
-                    {agent.phone && (
-                      <p className="text-sm text-muted-foreground">{agent.phone}</p>
-                    )}
                     {agent.verified && (
-                      <Badge variant="secondary" className="mt-2">Verified</Badge>
+                      <Badge variant="secondary" className="mt-2">Verified Agent</Badge>
                     )}
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Send a message to contact this agent
+                    </p>
                   </div>
 
                   <form onSubmit={handleSendMessage} className="space-y-4">
