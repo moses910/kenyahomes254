@@ -107,7 +107,7 @@ export default function AgentDashboard() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">My Listings</h1>
           <Button asChild>
-            <Link to="/listings/create">
+            <Link to="/dashboard/create">
               <Plus className="mr-2 h-4 w-4" />
               Create New Listing
             </Link>
@@ -197,7 +197,7 @@ export default function AgentDashboard() {
                 Create your first property listing to get started
               </p>
               <Button asChild>
-                <Link to="/listings/create">
+                <Link to="/dashboard/create">
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Listing
                 </Link>
