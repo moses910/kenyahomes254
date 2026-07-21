@@ -15,6 +15,7 @@ const Favourites = lazy(() => import("./pages/Favourites"));
 const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
 const CreateProperty = lazy(() => import("./pages/CreateProperty"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/dashboard" element={<AgentDashboard />} />
               <Route path="/dashboard/create" element={<CreateProperty />} />
               <Route path="/listings/edit/:id" element={<CreateProperty />} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
