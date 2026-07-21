@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePropertyForm } from '@/hooks/usePropertyForm';
+import { usePropertyForm, PropertyFormData } from '@/hooks/usePropertyForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
