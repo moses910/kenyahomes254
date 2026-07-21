@@ -6,15 +6,20 @@
 import { auth, defineMcp } from "npm:@lovable.dev/mcp-js@0.24.0";
 
 // src/lib/mcp/tools/search-properties.ts
-import { createClient } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool } from "npm:@lovable.dev/mcp-js@0.24.0";
-import { z } from "npm:zod@^3.25.76";
+
+// src/lib/mcp/supabase-client.ts
+import { createClient } from "npm:@supabase/supabase-js@^2.81.1";
+var env = globalThis.process?.env ?? {};
 function supabaseForUser(ctx) {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
+  return createClient(env.SUPABASE_URL ?? "", env.SUPABASE_PUBLISHABLE_KEY ?? "", {
     global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
     auth: { persistSession: false, autoRefreshToken: false }
   });
 }
+
+// src/lib/mcp/tools/search-properties.ts
+import { z } from "npm:zod@^3.25.76";
 var search_properties_default = defineTool({
   name: "search_properties",
   title: "Search properties",
@@ -51,15 +56,8 @@ var search_properties_default = defineTool({
 });
 
 // src/lib/mcp/tools/get-property.ts
-import { createClient as createClient2 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool2 } from "npm:@lovable.dev/mcp-js@0.24.0";
 import { z as z2 } from "npm:zod@^3.25.76";
-function supabaseForUser2(ctx) {
-  return createClient2(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var get_property_default = defineTool2({
   name: "get_property",
   title: "Get property details",
@@ -72,7 +70,7 @@ var get_property_default = defineTool2({
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
-    const { data, error } = await supabaseForUser2(ctx).from("properties").select("*, property_photos(storage_path,ordering)").eq("id", property_id).maybeSingle();
+    const { data, error } = await supabaseForUser(ctx).from("properties").select("*, property_photos(storage_path,ordering)").eq("id", property_id).maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     if (!data) return { content: [{ type: "text", text: "Property not found" }], isError: true };
     return {
@@ -83,14 +81,7 @@ var get_property_default = defineTool2({
 });
 
 // src/lib/mcp/tools/list-saved-properties.ts
-import { createClient as createClient3 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.24.0";
-function supabaseForUser3(ctx) {
-  return createClient3(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var list_saved_properties_default = defineTool3({
   name: "list_saved_properties",
   title: "List my saved properties",
@@ -101,7 +92,7 @@ var list_saved_properties_default = defineTool3({
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
-    const { data, error } = await supabaseForUser3(ctx).from("saved_properties").select("id, created_at, properties(id,title,price,currency,for_rent,beds,baths,city,address)").eq("user_id", ctx.getUserId()).order("created_at", { ascending: false });
+    const { data, error } = await supabaseForUser(ctx).from("saved_properties").select("id, created_at, properties(id,title,price,currency,for_rent,beds,baths,city,address)").eq("user_id", ctx.getUserId()).order("created_at", { ascending: false });
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
       content: [{ type: "text", text: JSON.stringify(data ?? []) }],
@@ -111,15 +102,8 @@ var list_saved_properties_default = defineTool3({
 });
 
 // src/lib/mcp/tools/save-property.ts
-import { createClient as createClient4 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.24.0";
 import { z as z3 } from "npm:zod@^3.25.76";
-function supabaseForUser4(ctx) {
-  return createClient4(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var save_property_default = defineTool4({
   name: "save_property",
   title: "Save a property",
@@ -132,7 +116,7 @@ var save_property_default = defineTool4({
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
-    const { data, error } = await supabaseForUser4(ctx).from("saved_properties").insert({ user_id: ctx.getUserId(), property_id }).select().maybeSingle();
+    const { data, error } = await supabaseForUser(ctx).from("saved_properties").insert({ user_id: ctx.getUserId(), property_id }).select().maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
       content: [{ type: "text", text: `Saved property ${property_id}` }],
@@ -142,15 +126,8 @@ var save_property_default = defineTool4({
 });
 
 // src/lib/mcp/tools/unsave-property.ts
-import { createClient as createClient5 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool5 } from "npm:@lovable.dev/mcp-js@0.24.0";
 import { z as z4 } from "npm:zod@^3.25.76";
-function supabaseForUser5(ctx) {
-  return createClient5(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var unsave_property_default = defineTool5({
   name: "unsave_property",
   title: "Remove a saved property",
@@ -163,21 +140,14 @@ var unsave_property_default = defineTool5({
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
-    const { error } = await supabaseForUser5(ctx).from("saved_properties").delete().eq("user_id", ctx.getUserId()).eq("property_id", property_id);
+    const { error } = await supabaseForUser(ctx).from("saved_properties").delete().eq("user_id", ctx.getUserId()).eq("property_id", property_id);
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return { content: [{ type: "text", text: `Removed property ${property_id} from saved list` }] };
   }
 });
 
 // src/lib/mcp/tools/list-my-listings.ts
-import { createClient as createClient6 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool6 } from "npm:@lovable.dev/mcp-js@0.24.0";
-function supabaseForUser6(ctx) {
-  return createClient6(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var list_my_listings_default = defineTool6({
   name: "list_my_listings",
   title: "List my property listings",
@@ -188,7 +158,7 @@ var list_my_listings_default = defineTool6({
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
-    const { data, error } = await supabaseForUser6(ctx).from("properties").select("id,title,status,price,currency,for_rent,beds,baths,city,address,created_at").eq("agent_id", ctx.getUserId()).order("created_at", { ascending: false });
+    const { data, error } = await supabaseForUser(ctx).from("properties").select("id,title,status,price,currency,for_rent,beds,baths,city,address,created_at").eq("agent_id", ctx.getUserId()).order("created_at", { ascending: false });
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
       content: [{ type: "text", text: JSON.stringify(data ?? []) }],
@@ -198,15 +168,8 @@ var list_my_listings_default = defineTool6({
 });
 
 // src/lib/mcp/tools/list-my-messages.ts
-import { createClient as createClient7 } from "npm:@supabase/supabase-js@^2.81.1";
 import { defineTool as defineTool7 } from "npm:@lovable.dev/mcp-js@0.24.0";
 import { z as z5 } from "npm:zod@^3.25.76";
-function supabaseForUser7(ctx) {
-  return createClient7(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
-    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-}
 var list_my_messages_default = defineTool7({
   name: "list_my_messages",
   title: "List my messages",
@@ -221,7 +184,7 @@ var list_my_messages_default = defineTool7({
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
     const uid = ctx.getUserId();
-    let q = supabaseForUser7(ctx).from("messages").select("id, property_id, seeker_id, agent_id, body, email, phone, created_at").order("created_at", { ascending: false }).limit(limit);
+    let q = supabaseForUser(ctx).from("messages").select("id, property_id, seeker_id, agent_id, body, email, phone, created_at").order("created_at", { ascending: false }).limit(limit);
     if (role === "sent") q = q.eq("seeker_id", uid);
     else if (role === "received") q = q.eq("agent_id", uid);
     else q = q.or(`seeker_id.eq.${uid},agent_id.eq.${uid}`);
