@@ -3,7 +3,7 @@ import SearchBar from '@/components/search/SearchBar';
 import PropertyCard from '@/components/PropertyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { SearchFilters } from '@/types';
+import { SearchFilters, PropertyCardData } from '@/types';
 
 export default function Home() {
   const { properties, loading, refetch } = useSearchProperties();
