@@ -5,9 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Home } from 'lucide-react';
+
+// Only same-origin relative paths are allowed as post-auth return targets.
+function safeNext(raw: string | null): string {
+  if (!raw) return '/';
+  if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
+}
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,12 +26,19 @@ export default function Auth() {
   
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNext(searchParams.get('next'));
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      // Use full navigation for cross-route absolute redirects (e.g. OAuth consent).
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, nextPath]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +52,11 @@ export default function Auth() {
       toast.error(error.message);
     } else {
       toast.success('Signed in successfully!');
-      navigate('/');
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
   };
 
@@ -54,7 +72,11 @@ export default function Auth() {
       toast.error(error.message);
     } else {
       toast.success('Account created successfully!');
-      navigate('/');
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
   };
 
