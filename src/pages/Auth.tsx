@@ -26,12 +26,19 @@ export default function Auth() {
   
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNext(searchParams.get('next'));
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      // Use full navigation for cross-route absolute redirects (e.g. OAuth consent).
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, nextPath]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +52,11 @@ export default function Auth() {
       toast.error(error.message);
     } else {
       toast.success('Signed in successfully!');
-      navigate('/');
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
   };
 
@@ -61,7 +72,11 @@ export default function Auth() {
       toast.error(error.message);
     } else {
       toast.success('Account created successfully!');
-      navigate('/');
+      if (nextPath !== '/') {
+        window.location.href = nextPath;
+      } else {
+        navigate('/');
+      }
     }
   };
 
