@@ -2,15 +2,9 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-
-interface Profile {
-  id: string;
-  email: string;
-  role: 'seeker' | 'agent' | 'admin';
-  name: string | null;
-  phone: string | null;
-  verified: boolean;
-}
+import { Profile } from '@/types';
+import { UserRole } from '@/constants';
+import { profileService } from '@/services/profileService';
 
 interface AuthContextType {
   user: User | null;
@@ -18,7 +12,7 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, name: string, role: 'seeker' | 'agent') => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string, role: UserRole) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -64,14 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data as Profile);
+    try {
+      const data = await profileService.getProfileById(userId);
+      if (data) {
+        setProfile(data as Profile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -90,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, name: string, role: 'seeker' | 'agent') => {
+  const signUp = async (email: string, password: string, name: string, role: UserRole) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       

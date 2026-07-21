@@ -1,178 +1,17 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Bed, Bath, Maximize, MapPin, Heart, Send } from 'lucide-react';
-import { toast } from 'sonner';
-import { z } from 'zod';
-
-const messageSchema = z.object({
-  body: z.string().trim().min(1, 'Message cannot be empty').max(5000, 'Message must be less than 5000 characters'),
-  email: z.string().trim().email('Invalid email format').max(255, 'Email must be less than 255 characters').optional().or(z.literal('')),
-  phone: z.string().trim().regex(/^\+?[0-9\s\-\(\)]{6,20}$/, 'Invalid phone format').max(20, 'Phone must be less than 20 characters').optional().or(z.literal('')),
-});
+import { ArrowLeft } from 'lucide-react';
+import PropertyImageGallery from '@/components/property/PropertyImageGallery';
+import PropertyInfo from '@/components/property/PropertyInfo';
+import ContactAgentForm from '@/components/property/ContactAgentForm';
+import { usePropertyDetail } from '@/hooks/useProperties';
+import { useEffect } from 'react';
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [property, setProperty] = useState<any>(null);
-  const [agent, setAgent] = useState<any>(null);
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isSaved, setIsSaved] = useState(false);
-  const [message, setMessage] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [sending, setSending] = useState(false);
-
-  useEffect(() => {
-    if (id) {
-      fetchProperty();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (user && property) {
-      checkIfSaved();
-    }
-  }, [user, property]);
-
-  const fetchProperty = async () => {
-    setLoading(true);
-
-    const { data: propData, error: propError } = await supabase
-      .from('properties')
-      .select(`
-        *,
-        property_photos(*)
-      `)
-      .eq('id', id)
-      .single();
-
-    if (propError || !propData) {
-      toast.error('Property not found');
-      navigate('/');
-      return;
-    }
-
-    setProperty(propData);
-    setPhotos(propData.property_photos || []);
-
-    // Fetch agent details - use public view to only get safe, non-sensitive data
-    const { data: agentData } = await supabase
-      .from('public_agent_profiles')
-      .select('id, name, role, verified, created_at')
-      .eq('id', propData.agent_id)
-      .single();
-
-    if (agentData) {
-      setAgent(agentData);
-    }
-
-    setLoading(false);
-  };
-
-  const checkIfSaved = async () => {
-    if (!user || !property) return;
-
-    const { data } = await supabase
-      .from('saved_properties')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('property_id', property.id)
-      .single();
-
-    setIsSaved(!!data);
-  };
-
-  const toggleSave = async () => {
-    if (!user) {
-      toast.error('Please sign in to save properties');
-      navigate('/auth');
-      return;
-    }
-
-    if (isSaved) {
-      const { error } = await supabase
-        .from('saved_properties')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('property_id', property.id);
-
-      if (!error) {
-        setIsSaved(false);
-        toast.success('Removed from favourites');
-      }
-    } else {
-      const { error } = await supabase
-        .from('saved_properties')
-        .insert({
-          user_id: user.id,
-          property_id: property.id,
-        });
-
-      if (!error) {
-        setIsSaved(true);
-        toast.success('Added to favourites');
-      }
-    }
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) {
-      toast.error('Please sign in to contact the agent');
-      navigate('/auth');
-      return;
-    }
-
-    // Validate input
-    const validation = messageSchema.safeParse({
-      body: message,
-      email: contactEmail || user.email,
-      phone: contactPhone,
-    });
-
-    if (!validation.success) {
-      const firstError = validation.error.errors[0];
-      toast.error(firstError.message);
-      return;
-    }
-
-    setSending(true);
-
-    const { error } = await supabase
-      .from('messages')
-      .insert({
-        property_id: property.id,
-        seeker_id: user.id,
-        agent_id: property.agent_id,
-        body: message.trim(),
-        email: contactEmail.trim() || user.email,
-        phone: contactPhone.trim() || null,
-      });
-
-    setSending(false);
-
-    if (error) {
-      console.error('Message send error:', error);
-      toast.error(error.message || 'Failed to send message');
-    } else {
-      toast.success('Message sent successfully!');
-      setMessage('');
-      setContactEmail('');
-      setContactPhone('');
-    }
-  };
+  const { property, agent, photos, loading } = usePropertyDetail(id);
 
   if (loading) {
     return (
@@ -206,137 +45,14 @@ export default function PropertyDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery */}
-            <div className="relative aspect-[16/9] bg-muted rounded-lg overflow-hidden">
-              {photos.length > 0 && photos[0].med_path ? (
-                <img
-                  src={photos[0].med_path}
-                  alt={property.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <MapPin className="h-24 w-24 text-muted-foreground" />
-                </div>
-              )}
-              <Badge className="absolute top-4 left-4 text-base">
-                {property.for_rent ? 'For Rent' : 'For Sale'}
-              </Badge>
-            </div>
-
-            {/* Property Details */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-3xl mb-2">{property.title}</CardTitle>
-                    <div className="flex items-center text-muted-foreground">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      <span>{property.address}, {property.city}</span>
-                    </div>
-                  </div>
-                  <Button
-                    size="icon"
-                    variant={isSaved ? 'default' : 'outline'}
-                    onClick={toggleSave}
-                  >
-                    <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <p className="text-4xl font-bold text-primary">
-                    {property.currency} {property.price.toLocaleString()}
-                    {property.for_rent && <span className="text-lg font-normal">/month</span>}
-                  </p>
-                </div>
-
-                <div className="flex gap-6">
-                  <div className="flex items-center gap-2">
-                    <Bed className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-medium">{property.beds} Bedrooms</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Bath className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-medium">{property.baths} Bathrooms</span>
-                  </div>
-                  {property.area_sqft && (
-                    <div className="flex items-center gap-2">
-                      <Maximize className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-medium">{property.area_sqft} sqft</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t">
-                  <h3 className="font-semibold text-lg mb-2">Description</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {property.description || 'No description available.'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <PropertyImageGallery property={property} photos={photos} />
+            <PropertyInfo property={property} />
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Agent Card */}
             {agent && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Agent</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <p className="font-semibold text-lg">{agent.name || 'Agent'}</p>
-                    {agent.verified && (
-                      <Badge variant="secondary" className="mt-2">Verified Agent</Badge>
-                    )}
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Send a message to contact this agent
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSendMessage} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message</Label>
-                      <Textarea
-                        id="message"
-                        placeholder="I'm interested in this property..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows={4}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email (optional)</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone (optional)</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+254..."
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={sending}>
-                      <Send className="mr-2 h-4 w-4" />
-                      {sending ? 'Sending...' : 'Send Message'}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+              <ContactAgentForm propertyId={property.id} agent={agent} />
             )}
           </div>
         </div>

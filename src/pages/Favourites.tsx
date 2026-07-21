@@ -1,56 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import PropertyCard from '@/components/PropertyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
+import { useFavourites } from '@/hooks/useSavedProperties';
+import { PropertyCardData } from '@/types';
 
 export default function Favourites() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { properties, loading } = useFavourites(user?.id);
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
-      return;
     }
-    fetchFavourites();
   }, [user, navigate]);
-
-  const fetchFavourites = async () => {
-    if (!user) return;
-
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from('saved_properties')
-      .select(`
-        property_id,
-        properties (
-          *,
-          property_photos(thumb_path)
-        )
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      const props = data
-        .map((item: any) => item.properties)
-        .filter((prop: any) => prop !== null)
-        .map((prop: any) => ({
-          ...prop,
-          thumb_path: prop.property_photos?.[0]?.thumb_path || null,
-        }));
-      setProperties(props);
-    }
-
-    setLoading(false);
-  };
 
   if (loading) {
     return (
@@ -83,7 +50,7 @@ export default function Favourites() {
         {properties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
+              <PropertyCard key={property.id} property={property as unknown as PropertyCardData} />
             ))}
           </div>
         ) : (
