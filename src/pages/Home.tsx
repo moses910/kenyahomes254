@@ -3,6 +3,9 @@ import SearchBar from '@/components/search/SearchBar';
 import PropertyCard from '@/components/PropertyCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { SearchFilters, PropertyCardData } from '@/types';
 
 export default function Home() {
@@ -30,7 +33,15 @@ export default function Home() {
 
       {/* Properties Grid */}
       <section className="container mx-auto py-12 px-4">
-        <h2 className="text-3xl font-bold mb-8">Featured Properties</h2>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold">Featured Properties</h2>
+          <Button variant="ghost" asChild>
+            <Link to="/feed">
+              Browse all listings
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
         
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

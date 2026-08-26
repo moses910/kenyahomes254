@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 
 // Lazy loaded pages
 const Home = lazy(() => import("./pages/Home"));
+const Feed = lazy(() => import("./pages/Feed"));
 const Auth = lazy(() => import("./pages/Auth"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const Favourites = lazy(() => import("./pages/Favourites"));
@@ -30,6 +31,7 @@ const App = () => (
           <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/feed" element={<Feed />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/property/:id" element={<PropertyDetail />} />
               <Route path="/favourites" element={<Favourites />} />

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '@/services/propertyService';
-import { SearchFilters, PropertyWithPhotos, PropertyWithStats } from '@/types';
+import { SearchFilters, PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
 import { profileService } from '@/services/profileService';
 
 export const useSearchProperties = () => {
@@ -12,7 +12,7 @@ export const useSearchProperties = () => {
     try {
       const data = await propertyService.searchProperties(filters);
       if (data) {
-        const propertiesWithPhotos = data.map((prop: any) => ({
+        const propertiesWithPhotos = (data as unknown as PropertyWithPhotos[]).map((prop) => ({
           ...prop,
           thumb_path: prop.property_photos?.[0]?.thumb_path || null,
         }));
@@ -33,9 +33,9 @@ export const useSearchProperties = () => {
 };
 
 export const usePropertyDetail = (id: string | undefined) => {
-  const [property, setProperty] = useState<any>(null);
-  const [agent, setAgent] = useState<any>(null);
-  const [photos, setPhotos] = useState<any[]>([]);
+  const [property, setProperty] = useState<PropertyWithPhotos | null>(null);
+  const [agent, setAgent] = useState<AgentProfile | null>(null);
+  const [photos, setPhotos] = useState<PropertyPhoto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const useAgentProperties = (agentId: string | undefined) => {
     try {
       const data = await propertyService.getAgentProperties(agentId);
       if (data) {
-        const propsWithStats = data.map((prop: any) => ({
+        const propsWithStats = (data as unknown as PropertyWithStats[]).map((prop) => ({
           ...prop,
           thumb_path: prop.property_photos?.[0]?.thumb_path || null,
           saves_count: prop.saved_properties?.length || 0,
@@ -105,5 +105,16 @@ export const useAgentProperties = (agentId: string | undefined) => {
     }
   };
 
-  return { properties, loading, deleteProperty, refetch: fetchProperties };
+  const updatePropertyStatus = async (id: string, status: string) => {
+    try {
+      await propertyService.setPropertyStatus(id, status);
+      setProperties(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+      return true;
+    } catch (error) {
+      console.error('Error updating property status:', error);
+      return false;
+    }
+  };
+
+  return { properties, loading, deleteProperty, updatePropertyStatus, refetch: fetchProperties };
 };

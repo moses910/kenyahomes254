@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Heart, Edit, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Heart, Edit, Rocket, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PropertyWithStats } from '@/types';
 import { PropertyStatus } from '@/constants';
@@ -9,9 +9,12 @@ import { PropertyStatus } from '@/constants';
 interface DashboardPropertyCardProps {
   property: PropertyWithStats;
   onDeleteClick: (id: string) => void;
+  onToggleStatus: (property: PropertyWithStats) => void;
 }
 
-export default function DashboardPropertyCard({ property, onDeleteClick }: DashboardPropertyCardProps) {
+export default function DashboardPropertyCard({ property, onDeleteClick, onToggleStatus }: DashboardPropertyCardProps) {
+  const isPublished = property.status === PropertyStatus.PUBLISHED;
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -69,6 +72,23 @@ export default function DashboardPropertyCard({ property, onDeleteClick }: Dashb
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onToggleStatus(property)}
+              >
+                {isPublished ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Unlist
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="mr-2 h-4 w-4" />
+                    Publish
+                  </>
+                )}
               </Button>
               <Button
                 variant="outline"

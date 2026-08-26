@@ -8,7 +8,8 @@ import { Plus } from 'lucide-react';
 import DashboardPropertyCard from '@/components/dashboard/DashboardPropertyCard';
 import { useAgentProperties } from '@/hooks/useProperties';
 import { toast } from 'sonner';
-import { UserRole } from '@/constants';
+import { UserRole, PropertyStatus } from '@/constants';
+import { PropertyWithStats } from '@/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +24,7 @@ import {
 export default function AgentDashboard() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const { properties, loading, deleteProperty } = useAgentProperties(user?.id);
+  const { properties, loading, deleteProperty, updatePropertyStatus } = useAgentProperties(user?.id);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,6 +52,23 @@ export default function AgentDashboard() {
     }
 
     setDeleteId(null);
+  };
+
+  const handleToggleStatus = async (property: PropertyWithStats) => {
+    const isPublished = property.status === PropertyStatus.PUBLISHED;
+    const nextStatus = isPublished ? PropertyStatus.ARCHIVED : PropertyStatus.PUBLISHED;
+
+    const success = await updatePropertyStatus(property.id, nextStatus);
+
+    if (success) {
+      toast.success(
+        isPublished
+          ? 'Listing unlisted — removed from the public feed'
+          : 'Listing published — now visible in the feed'
+      );
+    } else {
+      toast.error('Failed to update listing status');
+    }
   };
 
   if (loading) {
@@ -86,6 +104,7 @@ export default function AgentDashboard() {
                 key={property.id} 
                 property={property} 
                 onDeleteClick={setDeleteId} 
+                onToggleStatus={handleToggleStatus}
               />
             ))}
           </div>
