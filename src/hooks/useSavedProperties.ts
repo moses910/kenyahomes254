@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { savedPropertyService } from '@/services/savedPropertyService';
 import { useAuth } from '@/contexts/AuthContext';
+import type { PropertyCardData } from '@/types';
 
 export const useSaveToggle = (propertyId: string | undefined) => {
   const { user } = useAuth();
@@ -41,7 +42,7 @@ export const useSaveToggle = (propertyId: string | undefined) => {
 };
 
 export const useFavourites = (userId: string | undefined) => {
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<PropertyCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchFavourites = useCallback(async () => {
@@ -50,10 +51,21 @@ export const useFavourites = (userId: string | undefined) => {
     try {
       const data = await savedPropertyService.getUserFavourites(userId);
       if (data) {
-        const formattedProps = data.map((item: any) => ({
-          ...item.properties,
-          thumb_path: item.properties.property_photos?.[0]?.thumb_path || null,
-        }));
+        const formattedProps: PropertyCardData[] = data.map((item) => {
+          const p = item.properties;
+          return {
+            id: p?.id ?? '',
+            title: p?.title ?? 'Untitled',
+            price: p?.price ?? null,
+            currency: p?.currency ?? 'KES',
+            for_rent: p?.for_rent ?? false,
+            beds: p?.beds ?? 0,
+            baths: p?.baths ?? 0,
+            city: p?.city ?? '',
+            address: p?.address ?? '',
+            thumb_path: p?.property_photos?.[0]?.thumb_path || null,
+          };
+        });
         setProperties(formattedProps);
       }
     } catch (error) {

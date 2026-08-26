@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const messageSchema = z.object({
   body: z.string().trim().min(1, 'Message cannot be empty').max(5000, 'Message must be less than 5000 characters'),
   email: z.string().trim().email('Invalid email format').max(255, 'Email must be less than 255 characters').optional().or(z.literal('')),
-  phone: z.string().trim().regex(/^\+?[0-9\s\-\(\)]{6,20}$/, 'Invalid phone format').max(20, 'Phone must be less than 20 characters').optional().or(z.literal('')),
+  phone: z.string().trim().regex(/^\+?[0-9\s\-()]{6,20}$/, 'Invalid phone format').max(20, 'Phone must be less than 20 characters').optional().or(z.literal('')),
 });
 
 export const useContactAgent = (propertyId: string, agentId: string) => {
@@ -41,9 +41,9 @@ export const useContactAgent = (propertyId: string, agentId: string) => {
       });
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Message send error:', error);
-      return { success: false, error: error.message || 'Failed to send message' };
+      return { success: false, error: error instanceof Error ? error.message : 'Failed to send message' };
     } finally {
       setSending(false);
     }

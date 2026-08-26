@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { propertyService } from '@/services/propertyService';
 import { storageService } from '@/services/storageService';
 import { useAuth } from '@/contexts/AuthContext';
+import type { PropertyPhoto } from '@/types';
 
 const propertySchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(100),
@@ -64,7 +65,7 @@ export const usePropertyForm = (propertyId?: string) => {
         form.setValue('property_type', property.for_rent ? 'rent' : 'sale');
 
         if (property.property_photos) {
-          const sortedPhotos = property.property_photos.sort((a: any, b: any) => a.ordering - b.ordering);
+          const sortedPhotos = property.property_photos.sort((a: PropertyPhoto, b: PropertyPhoto) => a.ordering - b.ordering);
           setExistingImages(sortedPhotos);
         }
       }
@@ -139,9 +140,9 @@ export const usePropertyForm = (propertyId?: string) => {
         }
       }
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving property:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : 'Failed to save property' };
     } finally {
       setIsSubmitting(false);
     }
