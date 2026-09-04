@@ -109,9 +109,9 @@ export default function Navbar() {
             asChild
             onClick={() => setMobileMenuOpen(false)}
           >
-            <Link to="/">
-              <Home className="mr-2 h-4 w-4" />
-              Home
+            <Link to="/feed">
+              <List className="mr-2 h-4 w-4" />
+              Listings
             </Link>
           </Button>
           {user ? (
