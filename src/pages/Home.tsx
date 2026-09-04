@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useFeed } from '@/hooks/useFeed';
 import SearchBar from '@/components/search/SearchBar';
 import PropertyCard from '@/components/PropertyCard';
@@ -9,10 +11,39 @@ import { Loader2, SearchX } from 'lucide-react';
 
 export default function Home() {
   const { properties, total, loading, loadingMore, hasMore, refetch, loadMore } = useFeed();
+  const location = useLocation();
+  const [searchKey, setSearchKey] = useState(0);
 
   const handleSearch = (filters: SearchFilters) => {
     refetch(filters);
   };
+
+  const scrollToSection = () => {
+    const section = document.getElementById('listings');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const handleReset = () => {
+      setSearchKey((prev) => prev + 1);
+      refetch({ priceRange: [0, 10000000] });
+      scrollToSection();
+    };
+
+    window.addEventListener('reset-home-listings', handleReset);
+    return () => window.removeEventListener('reset-home-listings', handleReset);
+  }, [refetch]);
+
+  useEffect(() => {
+    if (location.hash === '#listings') {
+      const timer = setTimeout(() => {
+        scrollToSection();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, location.pathname]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -26,12 +57,12 @@ export default function Home() {
             Discover the latest properties uploaded by agents across Kenya
           </p>
           
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar key={searchKey} onSearch={handleSearch} />
         </div>
       </section>
 
       {/* Properties Grid */}
-      <section className="container mx-auto py-12 px-4">
+      <section id="listings" className="container mx-auto py-12 px-4 scroll-mt-20">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl md:text-3xl font-bold">Latest Listings</h2>
           {!loading && (

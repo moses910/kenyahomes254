@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/constants';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
 export default function Navbar() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -23,21 +24,43 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleNavigateToListings = () => {
+    setMobileMenuOpen(false);
+    if (location.pathname === '/') {
+      window.dispatchEvent(new CustomEvent('reset-home-listings'));
+      const elem = document.getElementById('listings');
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (window.location.hash !== '#listings') {
+        window.history.pushState(null, '', '/#listings');
+      }
+    } else {
+      navigate('/#listings');
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
+        <Link
+          to="/"
+          className="flex items-center space-x-2"
+          onClick={() => {
+            if (location.pathname === '/') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >
           <Home className="h-6 w-6 text-primary" />
           <span className="font-bold text-xl hidden sm:inline-block">KenyaHomes</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" asChild>
-            <Link to="/feed">
-              <List className="mr-2 h-4 w-4" />
-              Listings
-            </Link>
+          <Button variant="ghost" onClick={handleNavigateToListings}>
+            <List className="mr-2 h-4 w-4" />
+            Listings
           </Button>
           {user ? (
             <>
@@ -106,13 +129,10 @@ export default function Navbar() {
           <Button
             variant="ghost"
             className="w-full justify-start"
-            asChild
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={handleNavigateToListings}
           >
-            <Link to="/feed">
-              <List className="mr-2 h-4 w-4" />
-              Listings
-            </Link>
+            <List className="mr-2 h-4 w-4" />
+            Listings
           </Button>
           {user ? (
             <>
