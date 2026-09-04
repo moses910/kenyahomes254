@@ -34,15 +34,9 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" asChild>
-<<<<<<< HEAD
             <Link to="/">
-              <List className="mr-2 h-4 w-4" />
-              Listings
-=======
-            <Link to="/feed">
               <Home className="mr-2 h-4 w-4" />
               Home
->>>>>>> 0422f3c3b6c882124e154999496fa7fd36442905
             </Link>
           </Button>
           {user ? (
@@ -115,15 +109,9 @@ export default function Navbar() {
             asChild
             onClick={() => setMobileMenuOpen(false)}
           >
-<<<<<<< HEAD
             <Link to="/">
-              <List className="mr-2 h-4 w-4" />
-              Listings
-=======
-            <Link to="/feed">
               <Home className="mr-2 h-4 w-4" />
               Home
->>>>>>> 0422f3c3b6c882124e154999496fa7fd36442905
             </Link>
           </Button>
           {user ? (
