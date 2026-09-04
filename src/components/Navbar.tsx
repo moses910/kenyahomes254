@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/constants';
 import { Button } from '@/components/ui/button';
-import { Home, Heart, LayoutDashboard, LogOut, Menu, Rss, X, User } from 'lucide-react';
+import { Home, Heart, LayoutDashboard, LogOut, Menu, X, User, List } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,9 +34,9 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link to="/feed">
-              <Rss className="mr-2 h-4 w-4" />
-              Feed
+            <Link to="/">
+              <List className="mr-2 h-4 w-4" />
+              Listings
             </Link>
           </Button>
           {user ? (
@@ -109,9 +109,9 @@ export default function Navbar() {
             asChild
             onClick={() => setMobileMenuOpen(false)}
           >
-            <Link to="/feed">
-              <Rss className="mr-2 h-4 w-4" />
-              Feed
+            <Link to="/">
+              <List className="mr-2 h-4 w-4" />
+              Listings
             </Link>
           </Button>
           {user ? (

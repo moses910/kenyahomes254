@@ -63,8 +63,8 @@ export default function AgentDashboard() {
     if (success) {
       toast.success(
         isPublished
-          ? 'Listing unlisted — removed from the public feed'
-          : 'Listing published — now visible in the feed'
+          ? 'Listing unlisted — removed from the public listings'
+          : 'Listing published — now visible on the home page'
       );
     } else {
       toast.error('Failed to update listing status');
