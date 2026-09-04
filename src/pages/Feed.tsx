@@ -21,7 +21,7 @@ export default function Feed() {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Rss className="h-7 w-7" />
-            <h1 className="text-3xl md:text-5xl font-bold">Property Feed</h1>
+            <h1 className="text-3xl md:text-5xl font-bold">Do you see what you like</h1>
           </div>
           <p className="text-lg md:text-xl mb-8 opacity-90">
             Latest listings uploaded by agents across Kenya

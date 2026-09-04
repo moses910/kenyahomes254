@@ -35,8 +35,8 @@ export default function Navbar() {
         <div className="hidden md:flex items-center space-x-4">
           <Button variant="ghost" asChild>
             <Link to="/feed">
-              <Rss className="mr-2 h-4 w-4" />
-              Feed
+              <Home className="mr-2 h-4 w-4" />
+              Home
             </Link>
           </Button>
           {user ? (
@@ -110,8 +110,8 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
           >
             <Link to="/feed">
-              <Rss className="mr-2 h-4 w-4" />
-              Feed
+              <Home className="mr-2 h-4 w-4" />
+              Home
             </Link>
           </Button>
           {user ? (
