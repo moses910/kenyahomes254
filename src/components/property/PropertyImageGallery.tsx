@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
 import { PropertyWithPhotos, PropertyPhoto } from '@/types';
+import { firstPhotoUrl } from '@/services/storageService';
 
 interface PropertyImageGalleryProps {
   property: PropertyWithPhotos;
@@ -10,9 +11,9 @@ interface PropertyImageGalleryProps {
 export default function PropertyImageGallery({ property, photos }: PropertyImageGalleryProps) {
   return (
     <div className="relative aspect-[16/9] bg-muted rounded-lg overflow-hidden">
-      {photos.length > 0 && photos[0].med_path ? (
+      {firstPhotoUrl(photos) ? (
         <img
-          src={photos[0].med_path}
+          src={firstPhotoUrl(photos)!}
           alt={property.title}
           className="w-full h-full object-cover"
         />

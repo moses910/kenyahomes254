@@ -42,7 +42,7 @@ export const savedPropertyService = {
         property_id,
         properties (
           *,
-          property_photos(thumb_path)
+          property_photos(storage_path, ordering)
         )
       `)
       .eq('user_id', userId)

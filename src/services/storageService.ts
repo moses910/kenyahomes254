@@ -56,3 +56,16 @@ export const storageService = {
     return data.publicUrl;
   }
 };
+
+/**
+ * Resolves the first (lowest-ordered) photo of a listing to a public image URL.
+ * Uploads only populate `storage_path`; `thumb_path`/`med_path` are unused.
+ */
+export const firstPhotoUrl = (
+  photos?: { storage_path?: string | null; ordering?: number | null }[] | null
+): string | null => {
+  if (!photos || photos.length === 0) return null;
+  const sorted = [...photos].sort((a, b) => (a.ordering ?? 0) - (b.ordering ?? 0));
+  const path = sorted[0]?.storage_path;
+  return path ? storageService.getPublicUrl(path) : null;
+};

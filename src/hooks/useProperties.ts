@@ -1,8 +1,43 @@
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '@/services/propertyService';
+<<<<<<< HEAD
 import { PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
 import { profileService } from '@/services/profileService';
 
+=======
+import { firstPhotoUrl } from '@/services/storageService';
+import { SearchFilters, PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
+import { profileService } from '@/services/profileService';
+
+export const useSearchProperties = () => {
+  const [properties, setProperties] = useState<PropertyWithPhotos[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProperties = useCallback(async (filters: SearchFilters = { priceRange: [0, 10000000] }) => {
+    setLoading(true);
+    try {
+      const data = await propertyService.searchProperties(filters);
+      if (data) {
+        const propertiesWithPhotos = (data as unknown as PropertyWithPhotos[]).map((prop) => ({
+          ...prop,
+          thumb_path: firstPhotoUrl(prop.property_photos),
+        }));
+        setProperties(propertiesWithPhotos);
+      }
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
+
+  return { properties, loading, refetch: fetchProperties };
+};
+>>>>>>> 0422f3c3b6c882124e154999496fa7fd36442905
 
 export const usePropertyDetail = (id: string | undefined) => {
   const [property, setProperty] = useState<PropertyWithPhotos | null>(null);
@@ -50,7 +85,7 @@ export const useAgentProperties = (agentId: string | undefined) => {
       if (data) {
         const propsWithStats = (data as unknown as PropertyWithStats[]).map((prop) => ({
           ...prop,
-          thumb_path: prop.property_photos?.[0]?.thumb_path || null,
+          thumb_path: firstPhotoUrl(prop.property_photos),
           saves_count: prop.saved_properties?.length || 0,
         }));
         setProperties(propsWithStats);
