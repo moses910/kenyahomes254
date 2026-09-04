@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { firstPhotoUrl } from '@/services/storageService';
 import { savedPropertyService } from '@/services/savedPropertyService';
 import { useAuth } from '@/contexts/AuthContext';
 import type { PropertyCardData } from '@/types';
@@ -63,7 +64,7 @@ export const useFavourites = (userId: string | undefined) => {
             baths: p?.baths ?? 0,
             city: p?.city ?? '',
             address: p?.address ?? '',
-            thumb_path: p?.property_photos?.[0]?.thumb_path || null,
+            thumb_path: firstPhotoUrl(p?.property_photos),
           };
         });
         setProperties(formattedProps);
