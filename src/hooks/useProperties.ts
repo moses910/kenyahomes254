@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '@/services/propertyService';
+import { firstPhotoUrl } from '@/services/storageService';
 import { SearchFilters, PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
 import { profileService } from '@/services/profileService';
 
@@ -14,7 +15,7 @@ export const useSearchProperties = () => {
       if (data) {
         const propertiesWithPhotos = (data as unknown as PropertyWithPhotos[]).map((prop) => ({
           ...prop,
-          thumb_path: prop.property_photos?.[0]?.thumb_path || null,
+          thumb_path: firstPhotoUrl(prop.property_photos),
         }));
         setProperties(propertiesWithPhotos);
       }
@@ -78,7 +79,7 @@ export const useAgentProperties = (agentId: string | undefined) => {
       if (data) {
         const propsWithStats = (data as unknown as PropertyWithStats[]).map((prop) => ({
           ...prop,
-          thumb_path: prop.property_photos?.[0]?.thumb_path || null,
+          thumb_path: firstPhotoUrl(prop.property_photos),
           saves_count: prop.saved_properties?.length || 0,
         }));
         setProperties(propsWithStats);

@@ -24,7 +24,7 @@ export const propertyService = {
       .from('properties')
       .select(`
         *,
-        property_photos(thumb_path)
+        property_photos(storage_path, ordering)
       `)
       .eq('status', PropertyStatus.PUBLISHED)
       .order('created_at', { ascending: false });
@@ -65,7 +65,7 @@ export const propertyService = {
 
     let query = supabase
       .from('properties')
-      .select('*, property_photos(thumb_path)', { count: 'exact' })
+      .select('*, property_photos(storage_path, ordering)', { count: 'exact' })
       .eq('status', PropertyStatus.PUBLISHED)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -115,7 +115,7 @@ export const propertyService = {
       .from('properties')
       .select(`
         *,
-        property_photos(thumb_path),
+        property_photos(storage_path, ordering),
         saved_properties(id)
       `)
       .eq('agent_id', agentId)

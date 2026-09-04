@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { propertyService } from '@/services/propertyService';
+import { firstPhotoUrl } from '@/services/storageService';
 import { PropertyWithPhotos, SearchFilters } from '@/types';
 
 const PAGE_SIZE = 12;
 
 const toCard = (prop: PropertyWithPhotos): PropertyWithPhotos => ({
   ...prop,
-  thumb_path: prop.property_photos?.[0]?.thumb_path || null,
+  thumb_path: firstPhotoUrl(prop.property_photos),
 });
 
 /**
