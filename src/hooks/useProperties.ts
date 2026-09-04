@@ -1,10 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '@/services/propertyService';
-<<<<<<< HEAD
-import { PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
-import { profileService } from '@/services/profileService';
-
-=======
 import { firstPhotoUrl } from '@/services/storageService';
 import { SearchFilters, PropertyWithPhotos, PropertyWithStats, PropertyPhoto, AgentProfile } from '@/types';
 import { profileService } from '@/services/profileService';
@@ -37,7 +32,6 @@ export const useSearchProperties = () => {
 
   return { properties, loading, refetch: fetchProperties };
 };
->>>>>>> 0422f3c3b6c882124e154999496fa7fd36442905
 
 export const usePropertyDetail = (id: string | undefined) => {
   const [property, setProperty] = useState<PropertyWithPhotos | null>(null);
