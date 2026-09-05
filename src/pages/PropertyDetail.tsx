@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyInfo from '@/components/property/PropertyInfo';
 import ContactAgentForm from '@/components/property/ContactAgentForm';
+import PropertyMap from '@/components/property/PropertyMap';
 import { usePropertyDetail } from '@/hooks/useProperties';
 import { useEffect } from 'react';
 
@@ -47,6 +48,12 @@ export default function PropertyDetail() {
           <div className="lg:col-span-2 space-y-6">
             <PropertyImageGallery property={property} photos={photos} />
             <PropertyInfo property={property} />
+            {property.latitude != null && property.longitude != null && (
+              <PropertyMap
+                latitude={Number(property.latitude)}
+                longitude={Number(property.longitude)}
+              />
+            )}
           </div>
 
           {/* Sidebar */}

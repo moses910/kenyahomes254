@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import ImageUploader from '@/components/property/ImageUploader';
+import LocationPicker from '@/components/property/LocationPicker';
 
 export default function CreateProperty() {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ export default function CreateProperty() {
     existingImages,
     imagesToDelete,
     setImagesToDelete,
+    location,
+    setLocation,
     isSubmitting,
     isLoading,
     handlers: { submitProperty }
@@ -214,6 +217,15 @@ export default function CreateProperty() {
               />
               {errors.region && <p className="text-sm text-destructive">{errors.region.message}</p>}
             </div>
+          </div>
+
+          {/* Pin Location */}
+          <div className="space-y-2">
+            <Label>Pin Location (optional)</Label>
+            <LocationPicker value={location} onChange={setLocation} />
+            <p className="text-xs text-muted-foreground">
+              Click the map to drop a pin so buyers can see the exact location.
+            </p>
           </div>
 
           {/* Image Upload */}

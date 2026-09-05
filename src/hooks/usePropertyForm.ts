@@ -6,6 +6,7 @@ import { propertyService } from '@/services/propertyService';
 import { storageService } from '@/services/storageService';
 import { useAuth } from '@/contexts/AuthContext';
 import type { PropertyPhoto } from '@/types';
+import type { LatLng } from '@/lib/map';
 
 const propertySchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(100),
@@ -38,6 +39,7 @@ export const usePropertyForm = (propertyId?: string) => {
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [location, setLocation] = useState<LatLng | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(!!propertyId);
 
@@ -63,6 +65,12 @@ export const usePropertyForm = (propertyId?: string) => {
         form.setValue('city', property.city || '');
         form.setValue('region', property.region || '');
         form.setValue('property_type', property.for_rent ? 'rent' : 'sale');
+
+        if (property.latitude != null && property.longitude != null) {
+          setLocation({ lat: Number(property.latitude), lng: Number(property.longitude) });
+        } else {
+          setLocation(null);
+        }
 
         if (property.property_photos) {
           const sortedPhotos = property.property_photos.sort((a: PropertyPhoto, b: PropertyPhoto) => a.ordering - b.ordering);
@@ -100,6 +108,8 @@ export const usePropertyForm = (propertyId?: string) => {
           address: data.address,
           city: data.city,
           region: data.region,
+          latitude: location?.lat ?? null,
+          longitude: location?.lng ?? null,
           for_rent: data.property_type === 'rent',
         });
 
@@ -131,6 +141,8 @@ export const usePropertyForm = (propertyId?: string) => {
           address: data.address,
           city: data.city,
           region: data.region,
+          latitude: location?.lat ?? null,
+          longitude: location?.lng ?? null,
           for_rent: data.property_type === 'rent',
           status: 'draft',
         }, user.id);
@@ -155,6 +167,8 @@ export const usePropertyForm = (propertyId?: string) => {
     existingImages,
     imagesToDelete,
     setImagesToDelete,
+    location,
+    setLocation,
     isSubmitting,
     isLoading,
     handlers: {

@@ -15,6 +15,8 @@ export interface CreatePropertyInput {
   address?: string | null;
   city?: string | null;
   region?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   status?: string | null;
 }
 
