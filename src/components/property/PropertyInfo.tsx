@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Heart, Bed, Bath, Maximize } from 'lucide-react';
+import { MapPin, Heart, Bed, Bath, Maximize, ExternalLink } from 'lucide-react';
 import { PropertyWithPhotos } from '@/types';
 import { useSaveToggle } from '@/hooks/useSavedProperties';
+import { googleMapsUrl, locationLabel } from '@/lib/googleMaps';
 
 interface PropertyInfoProps {
   property: PropertyWithPhotos;
@@ -10,6 +11,8 @@ interface PropertyInfoProps {
 
 export default function PropertyInfo({ property }: PropertyInfoProps) {
   const { isSaved, toggle } = useSaveToggle(property.id);
+  const location = locationLabel(property);
+  const mapsUrl = googleMapsUrl(property);
 
   return (
     <Card>
@@ -19,7 +22,20 @@ export default function PropertyInfo({ property }: PropertyInfoProps) {
             <CardTitle className="text-3xl mb-2">{property.title}</CardTitle>
             <div className="flex items-center text-muted-foreground">
               <MapPin className="h-4 w-4 mr-1" />
-              <span>{property.address}, {property.city}</span>
+              {mapsUrl ? (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${location} — open in Google Maps (opens in a new tab)`}
+                  className="inline-flex items-center gap-1 underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  {location}
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                </a>
+              ) : (
+                <span>{location}</span>
+              )}
             </div>
           </div>
           <Button

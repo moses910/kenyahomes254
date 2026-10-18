@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { ExternalLink } from "lucide-react";
 import { PIN_ICON } from "@/lib/map";
+import { googleMapsUrl } from "@/lib/googleMaps";
 
 interface PropertyMapProps {
   latitude: number;
@@ -12,6 +14,14 @@ export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+
+  const mapsUrl = googleMapsUrl({
+    latitude,
+    longitude,
+    address: null,
+    city: null,
+    region: null,
+  });
 
   // Initialise the map once.
   useEffect(() => {
@@ -60,9 +70,23 @@ export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
   return (
     <div className="overflow-hidden rounded-lg border">
       <div ref={containerRef} className="h-64 w-full" />
-      <p className="px-3 py-2 text-xs text-muted-foreground">
-        {latitude.toFixed(5)}, {longitude.toFixed(5)}
-      </p>
+      <div className="flex items-center justify-between gap-3 px-3 py-2 text-xs text-muted-foreground">
+        <span>
+          {latitude.toFixed(5)}, {longitude.toFixed(5)}
+        </span>
+        {mapsUrl && (
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View this location in Google Maps (opens in a new tab)"
+            className="inline-flex items-center gap-1 underline-offset-4 hover:text-foreground hover:underline"
+          >
+            View larger map
+            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          </a>
+        )}
+      </div>
     </div>
   );
 }
