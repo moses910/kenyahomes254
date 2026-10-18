@@ -1,13 +1,15 @@
 /**
  * The location a property carries. Every field can be missing: the map pin is
  * optional when an agent creates a listing, and the text fields are nullable.
+ * The text fields are optional too, so a caller that only knows coordinates
+ * does not have to pad them with nulls.
  */
 export interface PropertyLocation {
   latitude: number | null;
   longitude: number | null;
-  address: string | null;
-  city: string | null;
-  region: string | null;
+  address?: string | null;
+  city?: string | null;
+  region?: string | null;
 }
 
 /**

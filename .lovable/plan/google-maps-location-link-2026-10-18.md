@@ -1,6 +1,7 @@
 # Google Maps link on the property location tag
 
-Status: awaiting confirmation of the seams and the three edge calls below.
+Status: implemented. The seams and the three edge calls were confirmed before any
+code was written; everything below is what shipped.
 
 ## Problem Statement
 
@@ -62,8 +63,10 @@ re-inventing it.
   the fallback query.
 - **The map preview is otherwise untouched.** Same map, same non-interactive
   flags, same pin. Its caption keeps the coordinates and gains a "View larger map"
-  link to the same URL. The preview only renders when both coordinates exist, so
-  that link is always available wherever the caption appears.
+  link to the same URL. The preview only renders when both coordinates are
+  present, and the caption link is rendered from the same rule as the header, so
+  it appears wherever the caption shows a valid location and is left out rather
+  than rendered dead if that rule finds nothing to link.
 - **Outbound links are plain anchors** styled as part of the surrounding text, not
   filled buttons.
 
@@ -148,3 +151,15 @@ becomes an anchor when a URL exists, and the map caption gains "View larger map"
 Blocked by: 02. Acceptance: a listing with a pin, one with only a city, and one
 with no location each render the agreed behaviour, confirmed by a browser
 click-through.
+
+## Deferred from review
+
+- **The `test` script names one file.** It stays explicit while there is exactly
+  one test file; turn it into a glob the moment a second one exists. The script
+  needs Node 22.6 or newer for type stripping, which the repo does not declare an
+  `engines` range for.
+- **The country token lives in the module, not `src/constants.ts`**, because the
+  module is its only consumer. Move it when something else needs it.
+- **Both links share one component** so the new-tab, `rel` and accessible-name
+  rules cannot drift apart; the caption's accessible name contains its visible
+  text so speech input can activate it by name.

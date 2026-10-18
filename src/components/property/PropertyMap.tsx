@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { ExternalLink } from "lucide-react";
 import { PIN_ICON } from "@/lib/map";
 import { googleMapsUrl } from "@/lib/googleMaps";
+import MapsLink from "@/components/property/MapsLink";
 
 interface PropertyMapProps {
   latitude: number;
@@ -15,13 +15,7 @@ export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
-  const mapsUrl = googleMapsUrl({
-    latitude,
-    longitude,
-    address: null,
-    city: null,
-    region: null,
-  });
+  const mapsUrl = googleMapsUrl({ latitude, longitude });
 
   // Initialise the map once.
   useEffect(() => {
@@ -75,16 +69,12 @@ export default function PropertyMap({ latitude, longitude }: PropertyMapProps) {
           {latitude.toFixed(5)}, {longitude.toFixed(5)}
         </span>
         {mapsUrl && (
-          <a
+          <MapsLink
             href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="View this location in Google Maps (opens in a new tab)"
-            className="inline-flex items-center gap-1 underline-offset-4 hover:text-foreground hover:underline"
+            label="View larger map in Google Maps (opens in a new tab)"
           >
             View larger map
-            <ExternalLink className="h-3 w-3" aria-hidden="true" />
-          </a>
+          </MapsLink>
         )}
       </div>
     </div>

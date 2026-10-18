@@ -24,6 +24,13 @@ describe("googleMapsUrl", () => {
     );
   });
 
+  test("links by coordinates even when no text was supplied", () => {
+    assert.equal(
+      googleMapsUrl({ latitude: -1.2921, longitude: 36.8219 }),
+      "https://www.google.com/maps/search/?api=1&query=-1.2921,36.8219",
+    );
+  });
+
   test("honours a zero coordinate rather than treating it as missing", () => {
     assert.equal(
       googleMapsUrl({ ...noLocation, latitude: 0, longitude: 0 }),
